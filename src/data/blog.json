@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Blog 1",
+    "desc": "Blog 1 desc",
+    "content": "Content for blog one",
+    "slug": "blog-1"
+  },
+  {
+    "title": "Blog 2",
+    "desc": "Blog 2 desc",
+    "content": "Content for blog two",
+    "slug": "blog-2"
+  }
+]

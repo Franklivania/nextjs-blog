@@ -1,12 +1,27 @@
 import React from 'react'
-import data from "@/data/blog.json"
 import Link from 'next/link'
+import { client } from '@/lib/sanity';
 
 export const metadata = {
   title: "Blog Page"
 }
 
-export default function BlogLayout({ children }) {
+async function getPost() {
+  const query = `
+    *[_type == "post"] {
+    title,
+    "slug": slug.current,
+    "mainImage": mainImage.asset -> url
+  }`;
+
+  const data = client.fetch(query)
+
+  return data
+}
+
+export default async function BlogLayout({ children }) {
+  const data = await getPost()
+
   return (
     <main>
       <div className='flex items-center justify-between gap-y-8 px-[6%]'>
@@ -24,7 +39,7 @@ export default function BlogLayout({ children }) {
           ))}
         </section>
       </div>
-      <section>
+      <section className='flex items-center justify-center w-full max-w-3xl mx-auto'>
         {children}
       </section>
     </main>

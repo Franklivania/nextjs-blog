@@ -1,33 +1,36 @@
+import { client } from '@/lib/sanity';
+import { PortableText } from 'next-sanity';
+import Image from 'next/image';
 import React from 'react';
-import data from '@/data/blog.json';
 
-// Generate static paths for each blog post based on slug
-export async function generateStaticParams() {
-  if (!Array.isArray(data)) {
-    throw new Error('Data should be an array');
-  }
+async function getPost(params) {
+  const query = `
+    *[_type == "post" && slug.current == '${params}'] {
+  title,
+  "currentSlug": slug.current,
+  "mainImage": mainImage.asset -> url,
+  "author": author -> {
+    name,
+    "authorImage": image.asset -> url
+  },
+  body
+}[0]`;
 
-  return data.map((post) => ({
-    slug: post.slug,
-  }));
+  const data = client.fetch(query)
+  return data
 }
 
-// Component to display a specific blog post
-export default function BlogPost({ params }) {
-  const post = data.find((post) => post.slug === params.slug);
-
-  if (!post) {
-    return <div>Post not found</div>;
-  }
-
+export default async function BlogPost({ params }) {
+  const data = await getPost(params.slug)
+  // console.log(data)
   return (
-    <div>
-      <menu className='flex items-center gap-x-6'>
-      </menu>
-      <section className='w-max flex flex-col items-start gap-y-3 mx-auto mt-12'>
-        <h2 className='text-xl font-semibold'>{post.title}</h2>
-        <p>{post.desc}</p>
-        <div>{post.content}</div>
+    <div className='w-full h-full pb-24 pt-12 px-[4%]'>
+      <section role='presentation' className='mx-auto'>
+        <Image src={data.mainImage} width={400} height={400} alt={data.title} />
+
+        <div className='prose prose-headings:underline'>
+          <PortableText value={data.body} />
+        </div>
       </section>
     </div>
   );
